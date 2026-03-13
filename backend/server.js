@@ -7,7 +7,7 @@ const app = express()
 app.use(express.json())
 app.use(cors())
 
-mongoose.connect("mongodb://127.0.0.1:27017/lms")
+mongoose.connect("mongodb+srv://maripallygautam_db_user:jjGOQ97yiLlSN04k@cluster0.hpczuxx.mongodb.net/lms?appName=Cluster0")
 
 // USER MODEL
 const User = mongoose.model("User",{
