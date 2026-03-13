@@ -42,7 +42,7 @@ export default function Register() {
           transition={{ duration: 0.6, ease: "easeOut" }}
           className="w-full max-w-md"
         >
-          <div className="bg-white/10 backdrop-blur-xl border border-white/20 p-8 rounded-3xl shadow-[0_0_40px_-10px_rgba(0,0,0,0.5)]">
+          <div className="bg-slate-800/80 border border-white/20 p-8 rounded-3xl shadow-xl">
             <h2 className="text-3xl font-bold text-center mb-8 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400">
               Create Account
             </h2>

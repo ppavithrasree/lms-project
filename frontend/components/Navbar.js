@@ -27,7 +27,7 @@ export default function Navbar() {
       transition={{ duration: 0.5, ease: "easeOut" }}
       className="fixed top-0 left-0 right-0 z-50 flex justify-center mt-4 px-4"
     >
-      <div className="bg-black/40 backdrop-blur-xl border border-white/10 rounded-2xl w-full max-w-5xl px-6 py-4 flex justify-between items-center shadow-2xl">
+      <div className="bg-slate-900/80 backdrop-blur-sm border border-white/10 rounded-2xl w-full max-w-5xl px-6 py-4 flex justify-between items-center shadow-xl">
         <Link href="/">
           <div className="flex items-center gap-2 cursor-pointer group">
             <div className="bg-gradient-to-tr from-blue-500 to-purple-500 p-2 rounded-xl group-hover:scale-110 transition-transform">

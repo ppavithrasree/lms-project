@@ -75,7 +75,7 @@ export default function MyCourses() {
               <motion.div 
                 variants={item}
                 key={course._id} 
-                className="group bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl overflow-hidden shadow-xl hover:shadow-purple-500/20 hover:border-purple-500/30 transition-all flex flex-col h-full"
+                className="group bg-slate-800/60 backdrop-blur-[2px] border border-white/10 rounded-2xl overflow-hidden shadow-xl hover:shadow-purple-500/20 hover:border-purple-500/30 transition-all flex flex-col h-full"
               >
                 <div className="relative h-40 overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent z-10" />

@@ -10,23 +10,13 @@
 body {
   margin: 0;
   font-family: 'Inter', sans-serif;
-  background: linear-gradient(-45deg, #1e1b4b, #3b0764, #0f172a, #000000);
-  background-size: 400% 400%;
-  animation: gradientBG 15s ease infinite;
+  background-color: #0c0a15;
+  background-image: 
+    radial-gradient(circle at top right, #3b0764 0%, transparent 40%),
+    radial-gradient(circle at bottom left, #1e1b4b 0%, transparent 40%);
+  background-attachment: fixed;
   color: #f8fafc;
   min-height: 100vh;
-}
-
-@keyframes gradientBG {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
 }
 
 * {
