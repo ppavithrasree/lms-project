@@ -1,43 +1,48 @@
 import { useEffect, useState } from "react"
+import { useRouter } from "next/router"
 import axios from "axios"
 
-import { motion } from "framer-motion"
 import Navbar from "../components/Navbar"
-import { BookOpen, CheckCircle2 } from "lucide-react"
+import { BookOpen, CheckCircle2, PlayCircle, Trophy } from "lucide-react"
+import useStoredUser from "../hooks/useStoredUser"
 
 export default function MyCourses() {
+  const router = useRouter()
   const [courses, setCourses] = useState([])
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
+  const user = useStoredUser()
+  const loggedIn = Boolean(user)
 
   useEffect(() => {
-    const user = localStorage.getItem("user")
-    if(!user) {
-        setLoading(false)
-        return
+    if (!user) {
+      return
     }
 
     axios.get(`http://localhost:5000/mycourses/${user}`)
-      .then(res => {
+      .then((res) => {
         setCourses(res.data)
         setLoading(false)
       })
-      .catch(err => {
+      .catch(() => {
         alert("Error loading your courses")
         setLoading(false)
       })
-  }, [])
+  }, [user])
 
-  const container = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: { staggerChildren: 0.1 }
-    }
+  const openCourse = (courseId) => {
+    router.push(`/mycourses/${courseId}`)
   }
 
-  const item = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
+  const getStatusLabel = (course) => {
+    if (course.completed) {
+      return "Completed"
+    }
+
+    if ((course.progressPercent || 0) > 0) {
+      return "In Progress"
+    }
+
+    return "Not Started"
   }
 
   return (
@@ -45,47 +50,41 @@ export default function MyCourses() {
       <Navbar />
 
       <div className="max-w-6xl mx-auto px-6">
-        <motion.div 
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          className="flex items-center gap-3 mb-10"
-        >
+        <div className="flex items-center gap-3 mb-10">
           <BookOpen className="text-purple-400" size={32} />
           <h2 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-500">
             My Learning Journey
           </h2>
-        </motion.div>
+        </div>
 
         {loading ? (
           <div className="flex justify-center py-20">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
           </div>
-        ) : courses.length === 0 ? (
+        ) : !loggedIn || courses.length === 0 ? (
           <div className="text-center py-20 text-gray-400 bg-white/5 rounded-3xl border border-white/10 backdrop-blur-sm">
-            You haven't enrolled in any courses yet.
+            You haven&apos;t enrolled in any courses yet.
           </div>
         ) : (
-          <motion.div 
-            variants={container}
-            initial="hidden"
-            animate="show"
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-          >
-            {courses.map(course => (
-              <motion.div 
-                variants={item}
-                key={course._id} 
-                className="group bg-slate-800/60 backdrop-blur-[2px] border border-white/10 rounded-2xl overflow-hidden shadow-xl hover:shadow-purple-500/20 hover:border-purple-500/30 transition-all flex flex-col h-full"
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {courses.map((course) => (
+              <div
+                key={course._id}
+                className="group bg-slate-800/60 border border-white/10 rounded-2xl overflow-hidden shadow-lg hover:shadow-purple-500/10 hover:border-purple-500/30 transition-colors duration-200 flex flex-col h-full"
               >
                 <div className="relative h-40 overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent z-10" />
                   <img
                     src={course.image || "https://images.unsplash.com/photo-1517694712202-14dd9538aa97"}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                    className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300"
                     alt={course.title}
                   />
                   <div className="absolute top-4 right-4 z-20">
-                    <CheckCircle2 className="text-green-400 bg-black/50 rounded-full" size={24} />
+                    {course.completed ? (
+                      <Trophy className="text-amber-300 bg-black/50 rounded-full p-1" size={28} />
+                    ) : (
+                      <CheckCircle2 className="text-green-400 bg-black/50 rounded-full" size={24} />
+                    )}
                   </div>
                 </div>
 
@@ -93,17 +92,39 @@ export default function MyCourses() {
                   <h3 className="text-xl font-bold mb-2 text-white line-clamp-2">
                     {course.title}
                   </h3>
-                  
+
+                  <p className="text-sm text-gray-400 mb-5">
+                    {getStatusLabel(course)}
+                  </p>
+
                   <div className="mt-auto">
-                    <div className="w-full bg-white/10 rounded-full h-2 mb-2">
-                      <div className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full w-1/3"></div>
+                    <div className="w-full bg-white/10 rounded-full h-2 mb-2 overflow-hidden">
+                      <div
+                        className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full transition-all duration-500"
+                        style={{ width: `${course.progressPercent || 0}%` }}
+                      ></div>
                     </div>
-                    <p className="text-xs text-purple-300 font-medium">33% Completed</p>
+                    <div className="flex items-center justify-between text-xs mb-5">
+                      <p className="text-purple-300 font-medium">
+                        {course.completed ? "100% Completed" : `${course.progressPercent || 0}% Completed`}
+                      </p>
+                      <p className="text-gray-400">
+                        {Math.max((course.lastViewedPage ?? -1) + 1, 0)} / {course.totalLessons || 0} pages seen
+                      </p>
+                    </div>
+
+                    <button
+                      onClick={() => openCourse(course._id)}
+                      className="w-full flex items-center justify-center gap-2 bg-white/10 hover:bg-purple-600 border border-white/10 text-white font-semibold py-3 rounded-xl transition-colors"
+                    >
+                      <PlayCircle size={18} />
+                      {course.completed ? "Open Again" : (course.progressPercent || 0) > 0 ? "Continue Course" : "Start Course"}
+                    </button>
                   </div>
                 </div>
-              </motion.div>
+              </div>
             ))}
-          </motion.div>
+          </div>
         )}
       </div>
     </div>

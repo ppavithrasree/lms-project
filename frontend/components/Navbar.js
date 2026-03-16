@@ -1,32 +1,21 @@
 import Link from "next/link"
 import { useRouter } from "next/router"
-import { useEffect, useState } from "react"
-import { motion } from "framer-motion"
-import { LogOut, BookOpen, PlusCircle, MonitorPlay, Home } from "lucide-react"
+import { LogOut, BookOpen, PlusCircle, MonitorPlay, Home, UserCircle2 } from "lucide-react"
+import useStoredUser from "../hooks/useStoredUser"
 
 export default function Navbar() {
   const router = useRouter()
-  const [loggedIn, setLoggedIn] = useState(false)
-
-  useEffect(() => {
-    const user = localStorage.getItem("user")
-    if(user) {
-      setLoggedIn(true)
-    }
-  }, [])
+  const user = useStoredUser()
+  const loggedIn = Boolean(user)
 
   const logout = () => {
     localStorage.removeItem("user")
+    window.dispatchEvent(new Event("user-auth-changed"))
     router.push("/login")
   }
 
   return (
-    <motion.nav 
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      transition={{ duration: 0.5, ease: "easeOut" }}
-      className="fixed top-0 left-0 right-0 z-50 flex justify-center mt-4 px-4"
-    >
+    <nav className="fixed top-0 left-0 right-0 z-50 flex justify-center mt-4 px-4">
       <div className="bg-slate-900/80 backdrop-blur-sm border border-white/10 rounded-2xl w-full max-w-5xl px-6 py-4 flex justify-between items-center shadow-xl">
         <Link href="/">
           <div className="flex items-center gap-2 cursor-pointer group">
@@ -62,6 +51,14 @@ export default function Navbar() {
             </Link>
           )}
 
+          {loggedIn && (
+            <Link href="/profile">
+              <div className={`flex items-center gap-1.5 text-sm font-medium transition-colors ${router.pathname === '/profile' ? 'text-white' : 'text-gray-400 hover:text-white'}`}>
+                <UserCircle2 size={16} /> Profile
+              </div>
+            </Link>
+          )}
+
           {!loggedIn && (
             <Link href="/login">
               <div className="text-gray-400 hover:text-white text-sm font-medium transition-colors">
@@ -88,6 +85,6 @@ export default function Navbar() {
           )}
         </div>
       </div>
-    </motion.nav>
+    </nav>
   )
 }

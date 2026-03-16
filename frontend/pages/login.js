@@ -2,7 +2,6 @@ import { useState } from "react"
 import { useRouter } from "next/router"
 import axios from "axios"
 
-import { motion } from "framer-motion"
 import Navbar from "../components/Navbar"
 import { Mail, Lock } from "lucide-react"
 
@@ -22,6 +21,7 @@ export default function Login() {
     try {
       const res = await axios.post("http://localhost:5000/login", { email, password })
       localStorage.setItem("user", res.data.email)
+      window.dispatchEvent(new Event("user-auth-changed"))
       alert("Login successful! Welcome back.")
       router.push("/")
     } catch (error) {
@@ -36,12 +36,7 @@ export default function Login() {
       <Navbar />
       
       <div className="flex-1 flex items-center justify-center p-4">
-        <motion.div 
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
-          className="w-full max-w-md"
-        >
+        <div className="w-full max-w-md">
           <div className="bg-slate-800/80 border border-white/20 p-8 rounded-3xl shadow-xl">
             <h2 className="text-3xl font-bold text-center mb-8 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400">
               Welcome Back
@@ -70,23 +65,21 @@ export default function Login() {
                 />
               </div>
 
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+              <button
                 disabled={loading}
                 type="submit"
-                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 transition-all disabled:opacity-50"
+                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 transition-all disabled:opacity-50"
               >
                 {loading ? "Logging in..." : "Login"}
-              </motion.button>
+              </button>
             </form>
             
             <p className="mt-6 text-center text-sm text-gray-400">
-              Don't have an account?{' '}
+              Don&apos;t have an account?{" "}
               <span onClick={() => router.push('/register')} className="text-blue-400 cursor-pointer hover:underline font-medium">Sign up</span>
             </p>
           </div>
-        </motion.div>
+        </div>
       </div>
     </div>
   )

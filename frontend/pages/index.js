@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react"
 import axios from "axios"
 
-import { motion } from "framer-motion"
 import Navbar from "../components/Navbar"
-import { GraduationCap, Clock } from "lucide-react"
+import { GraduationCap, Clock, Library } from "lucide-react"
 
 export default function Home() {
   const [courses, setCourses] = useState([])
@@ -11,11 +10,11 @@ export default function Home() {
 
   useEffect(() => {
     axios.get("http://localhost:5000/courses")
-      .then(res => {
+      .then((res) => {
         setCourses(res.data)
         setLoading(false)
       })
-      .catch(err => {
+      .catch(() => {
         alert("Failed to load courses")
         setLoading(false)
       })
@@ -23,8 +22,8 @@ export default function Home() {
 
   const enroll = async (course) => {
     const user = localStorage.getItem("user")
-    
-    if(!user) {
+
+    if (!user) {
       alert("Please login to enroll!")
       return
     }
@@ -32,26 +31,12 @@ export default function Home() {
     try {
       await axios.post("http://localhost:5000/enroll", {
         email: user,
-        courseId: course._id,
-        title: course.title
+        courseId: course._id
       })
-      alert(`Successfully enrolled in ${course.title}!`)
-    } catch (error) {
-      alert("Enrollment failed. Maybe you are already enrolled?")
+      alert(`Successfully enrolled in ${course.title}! You can now open it from the Library tab.`)
+    } catch {
+      alert("Enrollment failed. You may already be enrolled in this course.")
     }
-  }
-
-  const container = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: { staggerChildren: 0.1 }
-    }
-  }
-
-  const item = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
   }
 
   return (
@@ -59,18 +44,14 @@ export default function Home() {
       <Navbar />
 
       <div className="max-w-6xl mx-auto px-6">
-        <motion.div 
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-16"
-        >
+        <div className="text-center mb-16">
           <h1 className="text-5xl md:text-6xl font-extrabold mb-6 tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400">
             Expand Your Horizons
           </h1>
           <p className="text-gray-400 text-lg md:text-xl max-w-2xl mx-auto">
             Discover world-class courses taught by industry experts. Join our growing community of lifelong learners today.
           </p>
-        </motion.div>
+        </div>
 
         {loading ? (
           <div className="flex justify-center py-20">
@@ -81,29 +62,25 @@ export default function Home() {
             No courses available right now.
           </div>
         ) : (
-          <motion.div 
-            variants={container}
-            initial="hidden"
-            animate="show"
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-          >
-            {courses.map(course => (
-              <motion.div 
-                variants={item}
-                key={course._id} 
-                whileHover={{ y: -8, scale: 1.02 }}
-                className="group bg-slate-800/60 backdrop-blur-[2px] border border-white/10 rounded-2xl overflow-hidden shadow-xl hover:shadow-blue-500/20 hover:border-blue-500/30 transition-all flex flex-col h-full"
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {courses.map((course) => (
+              <div
+                key={course._id}
+                className="group bg-slate-800/60 border border-white/10 rounded-2xl overflow-hidden shadow-lg hover:shadow-blue-500/10 hover:border-blue-500/30 transition-colors duration-200 flex flex-col h-full"
               >
                 <div className="relative h-48 overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent z-10" />
                   <img
                     src={course.image || "https://images.unsplash.com/photo-1517694712202-14dd9538aa97"}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                    className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300"
                     alt={course.title}
                   />
                   <div className="absolute bottom-4 left-4 z-20 flex gap-2">
                     <span className="bg-blue-600/80 backdrop-blur-md text-xs font-bold px-3 py-1 rounded-full text-white flex items-center gap-1">
                       <GraduationCap size={14} /> New
+                    </span>
+                    <span className="bg-black/45 backdrop-blur-md text-xs font-medium px-3 py-1 rounded-full text-white flex items-center gap-1">
+                      <Library size={14} /> {course.lessonCount} pages
                     </span>
                   </div>
                 </div>
@@ -112,7 +89,7 @@ export default function Home() {
                   <h3 className="text-2xl font-bold mb-3 text-white line-clamp-2 leading-tight">
                     {course.title}
                   </h3>
-                  
+
                   <p className="text-gray-400 text-sm mb-6 flex-grow line-clamp-3">
                     {course.description}
                   </p>
@@ -121,18 +98,19 @@ export default function Home() {
                     <div className="flex items-center gap-1">
                       <Clock size={14} /> Self-Paced
                     </div>
+                    <div>{course.lessonCount} lesson pages</div>
                   </div>
 
                   <button
                     onClick={() => enroll(course)}
-                    className="w-full bg-white/10 hover:bg-blue-600 border border-white/10 text-white font-semibold py-3 rounded-xl transition-all hover:shadow-lg hover:shadow-blue-500/50"
+                    className="w-full bg-white/10 hover:bg-blue-600 border border-white/10 text-white font-semibold py-3 rounded-xl transition-colors"
                   >
                     Enroll Now
                   </button>
                 </div>
-              </motion.div>
+              </div>
             ))}
-          </motion.div>
+          </div>
         )}
       </div>
     </div>
